@@ -1,4 +1,4 @@
-# Step 1 — OCI Image Structure
+# OCI Image structure
 
 > Spec reference: [OCI Image Layout Specification](https://github.com/opencontainers/image-spec/blob/main/image-layout.md)
 
@@ -8,10 +8,31 @@ Everything inside is content-addressed: files are stored as blobs named by their
 
 ---
 
-## Archive layout
+## Step 1 — OCI images are just tarballs
 
-After running `docker save oci-demo:step1 -o step1.tar && tar xf step1.tar -C tmp/layer-inspect`
-you get:
+```bash
+cd step1-basic
+
+# Build the image
+docker build -f Containerfile -t oci-demo:step1 .
+
+# Run it to verify it works
+docker run --rm oci-demo:step1
+```
+
+Now export the image to a tar archive:
+
+```bash
+mkdir -p tmp
+docker save oci-demo:step1 -o ./tmp/step1.tar
+
+# Look at what's inside
+tar tf ./tmp/step1.tar
+```
+
+### Archive layout
+
+After running the commands you get 
 
 ```
 tmp/layer-inspect/
@@ -28,9 +49,9 @@ tmp/layer-inspect/
 
 ---
 
-## File by file
+### File by file
 
-### `oci-layout`
+#### `oci-layout`
 
 Marks the directory as an OCI Image Layout and states the spec version.
 
@@ -38,7 +59,7 @@ Marks the directory as an OCI Image Layout and states the spec version.
 {"imageLayoutVersion": "1.0.0"}
 ```
 
-### `index.json`
+#### `index.json`
 
 The top-level entry point.
 It is an [Image Index](https://github.com/opencontainers/image-spec/blob/main/image-index.md)
@@ -63,7 +84,7 @@ It is an [Image Index](https://github.com/opencontainers/image-spec/blob/main/im
 
 The digest `sha256:542433e4…` is the filename of the next blob to follow.
 
-### `manifest.json`
+#### `manifest.json`
 
 A legacy Docker-format manifest added by `docker save` for backwards compatibility with older tooling. Not part of the OCI spec — you can ignore it when reading the image spec.
 
@@ -75,7 +96,7 @@ A legacy Docker-format manifest added by `docker save` for backwards compatibili
 }]
 ```
 
-### `blobs/sha256/542433e4…` — the OCI Image Manifest
+#### `blobs/sha256/542433e4…` — the OCI Image Manifest
 
 > Spec: [image-manifest.md](https://github.com/opencontainers/image-spec/blob/main/manifest.md)
 
@@ -97,7 +118,7 @@ Points to the config blob and the ordered list of layer blobs for a specific pla
 }
 ```
 
-### `blobs/sha256/fac02a53…` — the Image Config
+#### `blobs/sha256/fac02a53…` — the Image Config
 
 > Spec: [config.md](https://github.com/opencontainers/image-spec/blob/main/config.md)
 
@@ -141,7 +162,7 @@ change and therefore has no corresponding entry in `rootfs.diff_ids`.
 The **ImageID** is simply the SHA-256 of this JSON document — because it references the digests
 of all layers, the ID is fully content-addressed and tamper-evident.
 
-### `blobs/sha256/a447a5de…` and `blobs/sha256/921d439b…` — Layer tarballs
+#### `blobs/sha256/a447a5de…` and `blobs/sha256/921d439b…` — Layer tarballs
 
 Each layer is a tar archive of the filesystem delta for that build step.
 
@@ -153,7 +174,7 @@ The result is the merged filesystem the container sees at runtime.
 
 ---
 
-## How it all connects
+### How it all connects
 
 ```mermaid
 graph TD
@@ -200,3 +221,35 @@ graph TD
 Every arrow is a `digest` field — a cryptographic hash of the blob's contents.
 Changing any file changes its digest, which changes every blob that references it,
 which changes the ImageID. The entire image is a Merkle tree.
+
+## Step 2 - Inspect each layer individually
+
+```bash
+mkdir -p tmp/layer-inspect
+tar xf ./tmp/step1.tar -C tmp/layer-inspect
+ls tmp/layer-inspect
+
+# In OCI layout, blobs have no extension — use manifest.json to find layer digests
+# Each layer blob is a gzipped tar named only by its sha256 digest
+cat tmp/layer-inspect/manifest.json | jq -r '.[0].Layers[]' | while read layer_path; do
+  digest="${layer_path##*/}"
+  dest="tmp/layer-inspect/blobs/sha256/${digest}-rootfs"
+  mkdir -p "$dest"
+  tar xzf "tmp/layer-inspect/$layer_path" -C "$dest"
+  echo "=== $digest ==="
+  ls "$dest"
+done
+```
+
+
+## Step 2 - Inspect the merged filesystem with the workbench
+
+
+Use the hardening workbench to merge all layers into one directory:
+
+```bash
+container-hardening-work-bench inspect -f Containerfile -o ./tmp/merged
+ls ./tmp/merged   # this is exactly what the container sees at runtime
+```
+
+./merged is the result of applying all layers on top of each other. This is exactly what the container sees at runtime — the union of all layers with whiteouts already resolved. You can `ls`, `cat`, and even `diff` this directory to explore the final filesystem.

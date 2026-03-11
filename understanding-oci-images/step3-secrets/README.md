@@ -1,20 +1,20 @@
-# Step 2 — Secrets in environment variables
+# Secrets in environment variables
 
 ## The problem
 
 ```bash
+mkdir -p tmp
 docker build -f Containerfile -t oci-demo:step2 .
-docker save oci-demo:step2 -o step2.tar
+docker save oci-demo:step2 -o ./tmp/step2.tar
 ```
 
 Crack open the image config:
 
 ```bash
-CONFIG=$(tar xf step2.tar manifest.json -O | jq -r '.[0].Config')
+CONFIG=$(tar xf ./tmp/step2.tar manifest.json -O | jq -r '.[0].Config')
 
 echo "Config file: $CONFIG"
-mkdir -p tmp
-tar xf step2.tar "$CONFIG" -O | jq '.config.Env'
+tar xf ./tmp/step2.tar "$CONFIG" -O | jq '.config.Env'
 ```
 
 **The passwords are right there in plain text.** Every `ENV` you set during build is stored permanently in the image config — anyone who can pull the image can read them.
@@ -44,9 +44,9 @@ docker build \
 Now prove the secrets are gone:
 
 ```bash
-docker save oci-demo:step2-solution -o step2-solution.tar
-CONFIG=$(tar xf step2-solution.tar manifest.json -O | jq -r '.[0].Config')
-tar xf step2-solution.tar "$CONFIG" -O | jq '.config.Env'
+docker save oci-demo:step2-solution -o ./tmp/step2-solution.tar
+CONFIG=$(tar xf ./tmp/step2-solution.tar manifest.json -O | jq -r '.[0].Config')
+tar xf ./tmp/step2-solution.tar "$CONFIG" -O | jq '.config.Env'
 # → ["PATH=/usr/local/sbin:…"]   ← no secrets, just the default PATH
 ```
 

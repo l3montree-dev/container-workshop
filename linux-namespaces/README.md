@@ -5,10 +5,11 @@ A minimal Go program that demonstrates real vs effective UID — the kernel mech
 ## Build and run
 
 ```bash
-go build -o setuid-demo .
+mkdir -p tmo
+go build -o ./tmp/setuid-demo .
 
 # Without setuid — both UIDs are yours
-./setuid-demo
+./tmp/setuid-demo
 # real uid:      1000
 # effective uid: 1000
 # → both UIDs match — running as yourself, no privilege escalation
@@ -23,7 +24,7 @@ go build -o setuid-demo .
 
 ```bash
 # Inside a linux machine or VM, copy to /var/tmp first
-cp setuid-demo /var/tmp && cd /var/tmp
+cp ./tmp/setuid-demo /var/tmp && cd /var/tmp
 
 sudo chown root setuid-demo
 sudo chmod u+s  setuid-demo

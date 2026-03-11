@@ -1,0 +1,7 @@
+FROM alpine:3.21
+
+# BETTER: create and delete in a SINGLE RUN layer
+# Everything happens atomically — /secret.txt never enters any layer
+RUN echo "this should disappear" > /secret.txt && rm /secret.txt
+
+CMD ["/bin/sh"]

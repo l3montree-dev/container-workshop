@@ -1,0 +1,11 @@
+FROM alpine:3.21
+
+# Layer 1: create a file
+RUN echo "this should disappear" > /secret.txt
+
+# Layer 2: try to remove it in a separate RUN
+# This creates a whiteout marker (.wh.secret.txt) in the new layer —
+# but /secret.txt is STILL present in layer 1 and shipped with the image!
+RUN rm /secret.txt
+
+CMD ["/bin/sh"]
