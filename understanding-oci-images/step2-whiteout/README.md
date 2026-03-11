@@ -15,7 +15,7 @@ mkdir -p tmp/whiteout-inspect
 tar xf tmp/step2-whiteout.tar -C tmp/whiteout-inspect
 ls tmp/whiteout-inspect
 
-# Look at the second layer (the rm layer) — find whiteout markers
+
 cat tmp/whiteout-inspect/manifest.json | jq -r '.[0].Layers[]' | while read layer_path; do
   digest="${layer_path##*/}"
   dest="tmp/whiteout-inspect/blobs/sha256/${digest}-rootfs"

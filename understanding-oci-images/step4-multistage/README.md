@@ -13,7 +13,18 @@ The final image is built `FROM scratch` — it contains **only** the compiled bi
 
 ```bash
 docker save oci-demo:step4 -o ./tmp/step4.tar
-tar tf ./tmp/step4.tar   # just one tiny layer
+mkdir -p tmp/step4-inspect
+tar xf tmp/step4.tar -C ./tmp/step4-inspect
+ls ./tmp/step4-inspect
+
+cat tmp/step4-inspect/manifest.json | jq -r '.[0].Layers[]' | while read layer_path; do
+  digest="${layer_path##*/}"
+  dest="tmp/step4-inspect/blobs/sha256/${digest}-rootfs"
+  mkdir -p "$dest"
+  tar xzf "tmp/step4-inspect/$layer_path" -C "$dest"
+  echo "=== $digest ==="
+  ls "$dest"
+done
 ```
 
 Use the workbench to inspect the merged filesystem:
