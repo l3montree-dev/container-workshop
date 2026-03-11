@@ -25,27 +25,32 @@ Full release listing: https://gitlab.opencode.de/oci-community/tools/container-h
 
 ```bash
 # macOS (Apple Silicon)
-curl -Lo chw.tar.gz https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/container-hardening-work-bench_1.1.0-rc.1_darwin_arm64.tar.gz
-tar xzf chw.tar.gz
+curl -LO https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/container-hardening-work-bench_1.1.0-rc.1_darwin_arm64.tar.gz
+tar xzf container-hardening-work-bench_1.1.0-rc.1_darwin_arm64.tar.gz
 sudo mv container-hardening-work-bench /usr/local/bin/
 
 # macOS (Intel)
-curl -Lo chw.tar.gz https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/container-hardening-work-bench_1.1.0-rc.1_darwin_amd64.tar.gz
-tar xzf chw.tar.gz
+curl -LO https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/container-hardening-work-bench_1.1.0-rc.1_darwin_amd64.tar.gz
+tar xzf container-hardening-work-bench_1.1.0-rc.1_darwin_amd64.tar.gz
 sudo mv container-hardening-work-bench /usr/local/bin/
 
 # Linux (amd64)
-curl -Lo chw.tar.gz https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/container-hardening-work-bench_1.1.0-rc.1_linux_amd64.tar.gz
-tar xzf chw.tar.gz
+curl -LO https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/container-hardening-work-bench_1.1.0-rc.1_linux_amd64.tar.gz
+tar xzf container-hardening-work-bench_1.1.0-rc.1_linux_amd64.tar.gz
 sudo mv container-hardening-work-bench /usr/local/bin/
 
 # Linux (arm64)
-curl -Lo chw.tar.gz https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/container-hardening-work-bench_1.1.0-rc.1_linux_arm64.tar.gz
-tar xzf chw.tar.gz
+curl -LO https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/container-hardening-work-bench_1.1.0-rc.1_linux_arm64.tar.gz
+tar xzf container-hardening-work-bench_1.1.0-rc.1_linux_arm64.tar.gz
 sudo mv container-hardening-work-bench /usr/local/bin/
 
 # Verify checksum (optional but recommended)
-curl -Lo checksums.txt https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/checksums.txt
+curl -LO https://gitlab.opencode.de/oci-community/tools/container-hardening-work-bench/-/releases/v1.1.0-rc.1/downloads/checksums.txt
+
+# macOS
+shasum -a 256 --check --ignore-missing checksums.txt
+
+# Linux
 sha256sum --check --ignore-missing checksums.txt
 ```
 
