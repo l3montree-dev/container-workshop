@@ -74,7 +74,13 @@
             packages = [
               pkgs.docker-client
               pkgs.jq
+              pkgs.gnutar
               (chw { inherit pkgs; })
+            ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+              # namespace demo tools (Linux only — these syscalls don't exist on macOS)
+              pkgs.util-linux   # unshare, nsenter, lsns
+              pkgs.shadow       # newuidmap, newgidmap
+              pkgs.go           # compile setuid-demo
             ];
 
             shellHook = ''

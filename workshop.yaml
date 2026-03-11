@@ -1,0 +1,34 @@
+# Lima VM — container-developer-workshop
+# Minimal Debian 12 (Bookworm)
+#
+# Usage:
+#   limactl start workshop.yaml   # first run: starts + provisions
+#   limactl shell workshop        # open a shell
+#   lima nix develop              # run the repo devShell inside the VM
+#   limactl stop workshop         # shut down
+
+images:
+  # Prefer dated snapshots; fall back to the rolling "latest" pointer.
+  - location: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
+    arch: "x86_64"
+  - location: "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-arm64.qcow2"
+    arch: "aarch64"
+
+cpus: 2
+memory: "4GiB"
+disk: "20GiB"
+
+mounts:
+  # Host home is readable inside the VM at the same path — lets you reach the repo.
+  - location: "~"
+    writable: true
+  # Writable scratch space (ext4, no nosuid — required for the setuid-demo).
+  - location: "/tmp/lima"
+    writable: true
+
+
+# Install NIX: 
+
+# sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon
+# sudo mkdir -p /etc/nix
+# echo 'experimental-features = nix-command flakes' | sudo tee -a /etc/nix/nix.conf
