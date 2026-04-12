@@ -31,13 +31,13 @@ BuildKit's `--mount=type=secret` makes a secret available inside a single `RUN` 
 
 ```bash
 # Write the secrets to files
-echo "super_secret_password_123" > /tmp/db_password
-echo "sk-prod-abc123xyz789"       > /tmp/api_key
+echo "super_secret_password_123" > ./tmp/db_password
+echo "sk-prod-abc123xyz789"       > ./tmp/api_key
 
 docker build \
   -f Containerfile.build-secrets \
-  --secret id=db_password,src=/tmp/db_password \
-  --secret id=api_key,src=/tmp/api_key \
+  --secret id=db_password,src=./tmp/db_password \
+  --secret id=api_key,src=./tmp/api_key \
   -t oci-demo:step2-solution .
 ```
 

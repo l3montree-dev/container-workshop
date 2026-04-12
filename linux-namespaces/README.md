@@ -5,7 +5,7 @@ A minimal Go program that demonstrates real vs effective UID — the kernel mech
 ## Build and run
 
 ```bash
-mkdir -p tmo
+mkdir -p tmp
 go build -o ./tmp/setuid-demo .
 
 # Without setuid — both UIDs are yours
